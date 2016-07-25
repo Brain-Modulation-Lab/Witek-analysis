@@ -1,0 +1,76 @@
+
+TITLE = 'vHPC - PFC';
+DIFFLEN = 651;
+
+T1=110;
+T2=220;
+T3=330;
+
+xlimits = [-5 60];
+ylimits = [-800 200];
+
+n=1; y=1;
+
+for i = 1:length(LTP_LFPanalysis)
+    if strcmp(LTP_LFPanalysis(i).group, 'Y')
+        diffyT(:,y) = mean(LTP_LFPanalysis(i).test.diff(:,1:T3),2);
+        diffy1(:,y) = mean(LTP_LFPanalysis(i).test.diff(:,1:T1),2);
+        diffy2(:,y) = mean(LTP_LFPanalysis(i).test.diff(:,(T1+1):T2),2);
+        diffy3(:,y) = mean(LTP_LFPanalysis(i).test.diff(:,(T2+1):T3),2);
+        y=y+1;
+    elseif strcmp(LTP_LFPanalysis(i).group, 'N')
+        diffnT(:,n) = mean(LTP_LFPanalysis(i).test.diff(:,1:T3),2);
+        diffn1(:,n) = mean(LTP_LFPanalysis(i).test.diff(:,1:T1),2);
+        diffn2(:,n) = mean(LTP_LFPanalysis(i).test.diff(:,(T1+1):T2),2);
+        diffn3(:,n) = mean(LTP_LFPanalysis(i).test.diff(:,(T2+1):T3),2);
+        n=n+1;
+    end
+end
+
+
+figure; hold on;
+plot((1:DIFFLEN)/10-5, mean(diffnT,2), 'LineWidth', 2, 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffnT,2)+std(diffnT,[],2)/sqrt(cols(diffnT)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffnT,2)-std(diffnT,[],2)/sqrt(cols(diffnT)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffyT,2), 'LineWidth', 2, 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffyT,2)+std(diffyT,[],2)/sqrt(cols(diffyT)), ':', 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffyT,2)-std(diffyT,[],2)/sqrt(cols(diffyT)), ':', 'color', 'red');
+xlim(xlimits);
+ylim(ylimits);
+title([TITLE, ' difference from baseline (0 - ', num2str(ceil(T1/6)), ' min)']);
+
+
+figure; hold on;
+plot((1:DIFFLEN)/10-5, mean(diffn1,2), 'LineWidth', 2, 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffn1,2)+std(diffn1,[],2)/sqrt(cols(diffn1)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffn1,2)-std(diffn1,[],2)/sqrt(cols(diffn1)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffy1,2), 'LineWidth', 2, 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffy1,2)+std(diffy1,[],2)/sqrt(cols(diffy1)), ':', 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffy1,2)-std(diffy1,[],2)/sqrt(cols(diffy1)), ':', 'color', 'red');
+xlim(xlimits);
+ylim(ylimits);
+title([TITLE, ' difference from baseline (', num2str(ceil((T1+1)/6)), ' min)']);
+
+
+figure; hold on;
+plot((1:DIFFLEN)/10-5, mean(diffn2,2), 'LineWidth', 2, 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffn2,2)+std(diffn2,[],2)/sqrt(cols(diffn2)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffn2,2)-std(diffn2,[],2)/sqrt(cols(diffn2)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffy2,2), 'LineWidth', 2, 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffy2,2)+std(diffy2,[],2)/sqrt(cols(diffy2)), ':', 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffy2,2)-std(diffy2,[],2)/sqrt(cols(diffy2)), ':', 'color', 'red');
+xlim(xlimits);
+ylim(ylimits);
+title([TITLE, ' difference from baseline ']);
+
+
+figure; hold on;
+plot((1:DIFFLEN)/10-5, mean(diffn3,2), 'LineWidth', 2, 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffn3,2)+std(diffn3,[],2)/sqrt(cols(diffn3)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffn3,2)-std(diffn3,[],2)/sqrt(cols(diffn3)), ':', 'color', 'blue');
+plot((1:DIFFLEN)/10-5, mean(diffy3,2), 'LineWidth', 2, 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffy3,2)+std(diffy3,[],2)/sqrt(cols(diffy3)), ':', 'color', 'red');
+plot((1:DIFFLEN)/10-5, mean(diffy3,2)-std(diffy3,[],2)/sqrt(cols(diffy3)), ':', 'color', 'red');
+xlim(xlimits);
+ylim(ylimits);
+title([TITLE, ' difference from baseline ']);

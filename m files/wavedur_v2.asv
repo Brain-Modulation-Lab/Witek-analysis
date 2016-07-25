@@ -1,0 +1,36 @@
+function [D1, D2] = wavedur_v2(Wm, sf, prespike, postspike)
+
+% 
+% D1 - positive phase
+% D2 - negative phase
+
+
+unit = 1000; %display millisecs
+D1max = 2.0*sf/unit; % samples
+prespike = prespike*sf/unit; %convert to samples
+postspike = postspike*sf/unit; %convert to samples
+
+baseline = mean(Wm(1:(prespike-D1max)));
+basestd = std(Wm(1:(prespike-D1max)));
+
+%find D1
+i=1;
+while abs(Wm(i) - baseline) < 5 * basestd % define onset as 5 x std(baseline)
+    %disp([num2str(i), ' : ']);
+    %disp(num2str(abs(Wm(i) - 5*baseline)));
+    %disp(num2str(basestd));
+    i = i+1;
+end
+D1rise = unit*(prespike - i + 2)/sf
+i=prespike;
+while (Wm(i) > baseline) % define offset as > baseline
+    i = i+1;
+end
+D1 = D1rise + i - prespike;
+
+%find D2
+
+while Wm(i) < baseline
+    i = i+1;
+end
+D2 = unit*(i - prespike - 1)/sf

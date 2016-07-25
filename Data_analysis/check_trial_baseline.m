@@ -1,0 +1,44 @@
+function check_trial_baseline(D, Events, sf, pre, post, minlat, binsize, filename)
+
+%D = zeros(size(V));
+%D(round(30000*ts))=1;
+
+for i = 1:length(Events)
+    DD(:,i) = D(round(sf*(Events(i)-pre)):round(sf*(Events(i)+post)));
+end
+
+NN = DD;
+NN(NN~=0)=1;
+
+NNbaseline = NN(1:(sf*(pre-minlat)),:);
+size(NNbaseline)
+
+for i=1:size(NNbaseline,2)
+    NNbasebin(:,i) = bin(NNbaseline(:,i), [], round(sf*binsize));
+end
+
+% figure; hold on;
+% for i=1:size(NNbaseline,2)
+%     plot(NNbasebin(:,i)-10*i)
+% end
+
+h=figure;
+
+plot(mean(NNbasebin,1), 'o');
+
+hold on; plot(xlim, (mean(mean(NNbasebin,1))-std(NNbasebin(:)))*[1 1], 'r');
+hold on; plot(xlim, (mean(mean(NNbasebin,1))+std(NNbasebin(:)))*[1 1], 'r');
+title(filename);
+xlabel('trial');
+ylabel('spikes / bin');
+
+
+
+
+
+
+
+
+
+ 
+

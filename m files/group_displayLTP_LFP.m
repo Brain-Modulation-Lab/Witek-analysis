@@ -1,0 +1,125 @@
+% group_diplayLTP_LFP
+
+% uses the LTP_LFPanalysis structure to plot group data.
+sf = 10000;
+stimf = 0.1;
+encoding = 'int16';
+scale_factor = 10000/(2^16-1);
+channel_num = 1;
+skip = 517; 
+pre = 20;
+post = 500;
+tbase = 19.5;
+tstart = 10;
+tstop = 30;
+baselength = 720; % maximum length of base files in minutes
+
+figure;
+colormap('default');
+cmap = colormap;
+
+% ------- DEBUG -------
+%disp('>>>>>>>>>>>>>>here');
+
+% align base.min and base.slope vecors, so that they co-terminate
+maxbaselen = stimf*60*baselength;
+alignbase = zeros(12,maxbaselen);
+k = 1; ky = 1; kn = 1;
+for i= 1:length(LTP_LFPanalysis)
+    if ~strcmp(LTP_LFPanalysis(i).group, 'X')
+        % ------- DEBUG -------
+        %disp('>>>>>>>>>>>>>>here');
+        if strcmp(LTP_LFPanalysis(i).group, 'Y')
+            alignbase_y(ky,(maxbaselen-length(LTP_LFPanalysis(i).base.slope)+1):maxbaselen) = LTP_LFPanalysis(i).base.slope;
+            %alignbasenorm_y(ky,(maxbaselen-length(LTP_LFPanalysis(i).base.slope)+1):maxbaselen) = LTP_LFPanalysis(i).base.slope / mean(LTP_LFPanalysis(i).base.slope);
+            ky = ky + 1;
+        elseif strcmp(LTP_LFPanalysis(i).group, 'N')
+            alignbase_n(kn,(maxbaselen-length(LTP_LFPanalysis(i).base.slope)+1):maxbaselen) = LTP_LFPanalysis(i).base.slope;
+            %alignbasenorm_n(kn,(maxbaselen-length(LTP_LFPanalysis(i).base.slope)+1):maxbaselen) = LTP_LFPanalysis(i).base.slope / mean(LTP_LFPanalysis(i).base.slope);
+            kn = kn + 1;
+        end
+        baselen(k) = length(LTP_LFPanalysis(i).base.slope);
+        testlen(k) = length(LTP_LFPanalysis(i).test.slope);
+        k = k + 1;
+    end
+end
+
+alignbase_y = alignbase_y(:, (maxbaselen-min(baselen)+1):maxbaselen);
+alignbase_n = alignbase_n(:, (maxbaselen-min(baselen)+1):maxbaselen);
+for i = 1:ky-1
+    alignbasenorm_y(i,:) = alignbase_y(i,:) / mean(alignbase_y(i,:));
+end
+for i = 1:kn-1
+    alignbasenorm_n(i,:) = alignbase_n(i,:) / mean(alignbase_n(i,:));
+end
+
+% hold on;
+% for i= 1:length(LTP_LFPanalysis)
+%     
+%     color = cmap(i*floor(length(cmap)/length(LTP_LFPanalysis)),:);
+%     
+%     plot( ((1:length(alignbase))/stimf - length(alignbase)/stimf)/60 - 10, alignbase(i,:), '.', 'color', color);
+%     plot( ((1:length(LTP_LFPanalysis(i).test.min))/stimf)/60, LTP_LFPanalysis(i).test.min, '.', 'color', color);
+% 
+%     xlabel('minutes');
+%     ylabel('minimum amplitude');
+%     
+% %     figure;
+% %     plot((binsize*(1:base.nbins)/stimf - binsize/2 + (hms2sec(base.tstart) - hms2sec(tltp)))/60, base.tmin_bin, '+', 'color', 'blue');
+% %     hold on; 
+% %     for(k=1:length(testfile))
+% %         plot((binsize*(1:test(k).nbins)/stimf - binsize/2 + (hms2sec(test(k).tstart) - hms2sec(tltp)))/60, test(k).tmin_bin, '.', 'color', 'red')
+% %     end
+% %     xlabel('minutes');
+% %     ylabel(['latency of minimum amplitude ', num2str(tstart), ' - ', num2str(tstop), ' ms post stim']);
+% 
+% end
+
+
+for i = 1:min(testlen)
+    
+    % ------- DEBUG -------
+    %disp('>>>>>>>>>>>>>>here');
+
+    testmean_y(i) = 0;
+    testmean_n(i) = 0;
+    testmeannorm_y(i) = 0;
+    testmeannorm_n(i) = 0;
+    
+    ky = 1; kn = 1;
+    for j = 1:length(LTP_LFPanalysis)
+        if ~strcmp(LTP_LFPanalysis(j).group, 'X')
+            if strcmp(LTP_LFPanalysis(j).group, 'Y')
+                testmean_y(i) = testmean_y(i) + LTP_LFPanalysis(j).test.slope(i);
+                testmeannorm_y(i) = testmeannorm_y(i) + (LTP_LFPanalysis(j).test.slope(i) / mean(LTP_LFPanalysis(j).base.slope));
+                ky = ky + 1;
+            elseif strcmp(LTP_LFPanalysis(j).group, 'N')
+                testmean_n(i) = testmean_n(i) + LTP_LFPanalysis(j).test.slope(i);
+                testmeannorm_n(i) = testmeannorm_n(i) + (LTP_LFPanalysis(j).test.slope(i) / mean(LTP_LFPanalysis(j).base.slope));
+                kn = kn + 1;
+            end 
+        end
+    end
+    
+    testmean_y(i) = testmean_y(i) / (ky-1);
+    testmean_n(i) = testmean_n(i) / (kn-1);
+    testmeannorm_y(i) = testmeannorm_y(i) / (ky-1);
+    testmeannorm_n(i) = testmeannorm_n(i) / (kn-1);
+    
+end
+
+figure;
+hold on;
+
+% plot( ((1:length(alignbase_n))/stimf - length(alignbase_n)/stimf)/60 - 10, mean(alignbase_n), '.', 'color', 'blue');
+% plot( ((1:min(testlen))/stimf)/60, testmean_n, '.', 'color', 'blue');
+% 
+% plot( ((1:length(alignbase_y))/stimf - length(alignbase_y)/stimf)/60 - 10, mean(alignbase_y), '.', 'color', 'red');
+% plot( ((1:min(testlen))/stimf)/60, testmean_y, '.', 'color', 'red');
+
+size(testmeannorm_n)
+plot( ((1:length(alignbasenorm_n))/stimf - length(alignbasenorm_n)/stimf)/60 - 10, mean(alignbasenorm_n), '.', 'color', 'blue');
+plot( ((1:min(testlen))/stimf)/60, testmeannorm_n, '.', 'color', 'blue');
+
+plot( ((1:length(alignbasenorm_y))/stimf - length(alignbasenorm_y)/stimf)/60 - 10, mean(alignbasenorm_y), '.', 'color', 'red');
+plot( ((1:min(testlen))/stimf)/60, testmeannorm_y, '.', 'color', 'red');

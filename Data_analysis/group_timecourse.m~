@@ -1,0 +1,21 @@
+for tblock=1:10
+    group_timecourse(tblock).ipsi = zeros(501,37);
+    group_timecourse(tblock).contra = zeros(501,37);
+end
+
+for i=1:length(dat_files)
+    filename=dat_files(i).name;
+    S = load(filename);
+    for contact=1:length(S.timecourse)
+        for tblock=1:10
+            if dat_files(i).side==1
+                group_timecourse(tblock).ipsi = group_timecourse(tblock).ipsi + S.timecourse(contact).SPL_LR(tblock).blobzmi;
+                blobstats = blob_stats( S.timecourse(contact).SPL_LR(tblock), 'blobzmi', fq, t );
+                group_timecourse(tblock).contra = group_timecourse(tblock).contra + S.timecourse(contact).SPL_RR(tblock).blobzmi;
+            else
+                group_timecourse(tblock).ipsi = group_timecourse(tblock).ipsi + S.timecourse(contact).SPL_RR(tblock).blobzmi;
+                group_timecourse(tblock).contra = group_timecourse(tblock).contra + S.timecourse(contact).SPL_LR(tblock).blobzmi;
+            end
+        end
+    end
+end
