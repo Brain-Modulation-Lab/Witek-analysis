@@ -6,7 +6,7 @@
 subjectInfo;
 load(recFN);
 
-idx=3; %index of the trial set you want to look at
+idx=2; %index of the trial set you want to look at
 EventTimes = sort([Rec(idx).DigUp Rec(idx).DigDown]);
 [EventTimesTrellis] = GetEventData([dataFN '.nev']);
 
@@ -29,7 +29,8 @@ AudioEnv = abs(hilbert(highpassfilter(double(Audio),sampRate,100)));
 AudioEnv = smooth(AudioEnv,1500); %50 ms
 
 %% Do the audio analysis/ selection of audio start times
-AudioAnalysis;
+%AudioAnalysis;
+AutoAudioOnsetMarking;
 %% Save events/times to the Rec structure
 Rec(idx).tstart = tstart;
 Rec(idx).tend = tend;
